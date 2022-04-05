@@ -9,7 +9,7 @@ const Scatterplot = (props) => {
 	const dataName = props.dataName;
 	const method = props.method;
 
-	const ld = require(`../data/${dataName}/ld_${projectionIdx}.json`);
+	const ld = require(`/data/${dataName}/ld_${projectionIdx}.json`);
 
 	return (
 		<div>
