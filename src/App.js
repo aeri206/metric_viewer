@@ -119,8 +119,8 @@ function App() {
     setDataset(e.target.value);
   }
 
-  const metric = require(`./data/metric/${dataset}_metrics.json`);
-  const kmeans = require(`./data/kmeans/clustering_${dataset}.json`);
+  const metric = require(`/public/data/metric/${dataset}_metrics.json`);
+  const kmeans = require(`/public/data/kmeans/clustering_${dataset}.json`);
   console.log(metric)
 
   return (
