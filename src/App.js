@@ -3,7 +3,7 @@ import './App.css';
 import MetricChart from './components/MetricChart';
 import { useState } from 'react';
 import { VegaLite } from 'react-vega'
-import Scatterplot from './components/Scatterplot';
+// import Scatterplot from './components/Scatterplot';
 
 import { Box, InputLabel, MenuItem, FormControl, Select } from '@mui/material';
 

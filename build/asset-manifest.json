@@ -1,0 +1,15 @@
+{
+  "files": {
+    "main.css": "/metric_viewer/static/css/main.de87e6bd.css",
+    "main.js": "/metric_viewer/static/js/main.794d8bda.js",
+    "static/js/787.c1112931.chunk.js": "/metric_viewer/static/js/787.c1112931.chunk.js",
+    "index.html": "/metric_viewer/index.html",
+    "main.de87e6bd.css.map": "/metric_viewer/static/css/main.de87e6bd.css.map",
+    "main.794d8bda.js.map": "/metric_viewer/static/js/main.794d8bda.js.map",
+    "787.c1112931.chunk.js.map": "/metric_viewer/static/js/787.c1112931.chunk.js.map"
+  },
+  "entrypoints": [
+    "static/css/main.de87e6bd.css",
+    "static/js/main.794d8bda.js"
+  ]
+}
