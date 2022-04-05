@@ -157,13 +157,14 @@ function App() {
               <VegaLite spec={spec} data = {{table: metrics.map(x => x[1])}} />
               {
                 // console.log(indicies, metrics)
-                indicies.map((i, index) => 
-                  <Scatterplot
-                  method={metrics[index][1].method}
-                  dataName={dataset}
-                  projectionIdx={i}
-                  size={150}
-                  />)
+                // indicies.map((i, index) => 
+                  // <Scatterplot
+                  // method={metrics[index][1].method}
+                  // dataName={dataset}
+                  // projectionIdx={i}
+                  // size={150}
+                  // />
+                  // )
               }
             </Box>)
           })}
