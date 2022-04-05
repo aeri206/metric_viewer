@@ -1,0 +1,16 @@
+.sct-check{
+    display:none;
+}
+
+
+input:checked ~ label > a > canvas {
+    box-shadow: 
+    rgb(64 225 64 / 50%) 0 0 15px 5px, 
+    rgb(219 50 50 / 14%) 0px 1px 1px 0px, 
+    rgb(0 0 0 / 12%) 0px 1px 3px 0px;
+}
+.class {box-shadow: 
+    rgb(64 225 64 / 50%) 0 0 15px 5px, 
+    rgb(219 50 50 / 14%) 0px 1px 1px 0px, 
+    rgb(0 0 0 / 12%) 0px 1px 3px 0px;
+}

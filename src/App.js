@@ -1,11 +1,10 @@
 
 import './App.css';
-import MetricChart from './components/MetricChart';
-import { useState } from 'react';
-import { VegaLite } from 'react-vega'
+import { useEffect, useRef, useState } from 'react';
+import { Vega, VegaLite } from 'react-vega'
 import Scatterplot from './components/Scatterplot';
 
-import { Box, InputLabel, MenuItem, FormControl, Select } from '@mui/material';
+import { Box, InputLabel, MenuItem, FormControl, Select,FormControlLabel, Switch } from '@mui/material';
 
 const spec = {
   "config": {"view": {"continuousWidth": 400, "continuousHeight": 300}},
@@ -82,7 +81,9 @@ const spec = {
         "width": 100
       }
     ],
-    "data": {"name": "table"}
+    "data": {"name": "table"},
+    "height": 1900
+    
   },
   "spacing": 0
   
@@ -110,11 +111,143 @@ const datasets = {
   }
 
 
+  const radius = 2.5;
+
+  const pcpSpec = {
+    "data": {"name": "table"},
+    "transform":[
+      {"window": [{"op": "count", "as": "index"}]},
+      {"fold": ["Cohesiveness", "Continuity", "Steadiness", "Trustworthiness"]},
+      {
+        "joinaggregate": [
+          {"op": "min", "field": "value", "as": "min"},
+          {"op": "max", "field": "value", "as": "max"}
+        ],
+        "groupby": ["key"]
+      },
+      {
+        "calculate": "(datum.value - datum.min) / (datum.max-datum.min)",
+        "as": "norm_val"
+      },
+      {
+        "calculate": "(datum.min + datum.max) / 2",
+        "as": "mid"
+      }
+    ],
+    "layer": [{
+      "mark": {"type": "rule", "color": "#ccc"},
+      "encoding": {
+        "detail": {"aggregate": "count"},
+        "x": {"field": "key"}
+      }
+    }, {
+      "mark": "line",
+      "encoding": {
+        "color": {"type": "nominal", "field": "cluster"},
+        "detail": {"type": "nominal", "field": "index"},
+        "opacity": {"value": 0.3},
+        "x": {"type": "nominal", "field": "key"},
+        "y": {"type": "quantitative", "field": "norm_val", "axis": null},
+        "tooltip": [{
+          "type": "quantitative",
+          "field": "Cohesiveness"
+        }, {
+          "type": "quantitative",
+          "field": "Steadiness"
+        }, {
+          "type": "quantitative",
+          "field": "Continuity"
+        }, {
+          "type": "quantitative",
+          "field": "Trustworthiness"
+        }]
+      }
+    }, {
+      "encoding": {
+        "x": {"type": "nominal", "field": "key"},
+        "y": {"value": 0}
+      },
+      "layer": [{
+        "mark": {"type": "text", "style": "label"},
+        "encoding": {
+          "text": {"aggregate": "max", "field": "max"}
+        }
+      }, {
+        "mark": {"type": "tick", "style": "tick", "size": 8, "color": "#ccc"}
+      }]
+    },{
+      "encoding": {
+        "x": {"type": "nominal", "field": "key"},
+        "y": {"value": 150}
+      },
+      "layer": [{
+        "mark": {"type": "text", "style": "label"},
+        "encoding": {
+          "text": {"aggregate": "min", "field": "mid"}
+        }
+      }, {
+        "mark": {"type": "tick", "style": "tick", "size": 8, "color": "#ccc"}
+      }]
+    },{
+      "encoding": {
+        "x": {"type": "nominal", "field": "key"},
+        "y": {"value": 300}
+      },
+      "layer": [{
+        "mark": {"type": "text", "style": "label"},
+        "encoding": {
+          "text": {"aggregate": "min", "field": "min"}
+        }
+      }, {
+        "mark": {"type": "tick", "style": "tick", "size": 8, "color": "#ccc"}
+      }]
+    }
+  ],"config": {
+    "axisX": {"domain": false, "labelAngle": 0, "tickColor": "#ccc", "title": null},
+    "view": {"stroke": null},
+    "style": {
+      "label": {"baseline": "middle", "align": "right", "dx": -5},
+      "tick": {"orient": "horizontal"}
+    }
+  },
+    // "mark": "line",
+    // "encoding": {
+    //   "x": {"field": "key", "type": "nominal"},
+    //   // "y": {"field": "value", "type": "quantitative"},
+    //   "y": {"type": "quantitative", "field": "value", "axis": null},
+    //   "color": {"field": "cluster", "type": "nominal"}
+    // },
+    "width":500,
+    "height":300
+  }
+    
+//   "layer": [
+//   {
+//     "mark": "line",
+//     "encoding": {
+//       "color": {"type": "nominal", "field": "cluster"},
+//       "detail": {"type": "nominal", "field": "idx"},
+//       "opacity": {"value": 0.3},
+//       "x": {"type": "nominal", "field": "key"},
+//       "y": {"type": "quantitative", "field": "norm_val", "axis": null},
+//       "tooltip": [
+//         {"type": "quantitative", "field": "key"}]
+//       //   {"type": "quantitative", "field": "Beak Depth (mm)"},
+//       //   {"type": "quantitative", "field": "Flipper Length (mm)"},
+//       //   {"type": "quantitative", "field": "Body Mass (g)"}
+//       // ]
+//     }
+//   }
+// ]
+
 
 function App() {
 
   const [dataset, setDataset] = useState('mnist64');
+  const [showChart, setShowChart] = useState(true);
 
+  
+  
   const handleChange = e => {
     setDataset(e.target.value);
   }
@@ -123,9 +256,23 @@ function App() {
   const kmeans = require(`/public/data/kmeans/clustering_${dataset}.json`);
   const label = require(`/public/data/ld/${dataset}/label.json`);
 
+  let list = [];
+  
+
+  const metricIdx = Object.entries(metric).map(x => ({idx: parseInt(x[0]), ...x[1]}))
+  const pcpRef = useRef(metricIdx);
+  console.log(pcpRef.current)
+  
+
+
+
   return (
     <div className="App">
       <Box alignItems="left">
+      <FormControlLabel
+        sx={{display:''}}
+        control={<Switch checked={showChart} onChange={(e) => {setShowChart(e.target.checked)}}/>}
+        label="Metrics" />
       <FormControl >
         <InputLabel id="demo-simple-select-label">Dataset</InputLabel>
         <Select
@@ -141,12 +288,18 @@ function App() {
             })
           }
         </Select>
+        </FormControl>
+        {/* PCP HERE! */}
+        <Box>
+        <VegaLite spec={pcpSpec} data={{table: pcpRef.current}}/>
+        </Box>
         <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)' }}>
           {Object.values(kmeans).map((indicies, cluster) => {
             const metrics = Object.entries(metric).filter(([key, value]) => {
               return indicies.includes(parseInt(key))
             })
             return(
+              <>
             <Box
               component="div"
               key={`cluster-${cluster}`}
@@ -156,23 +309,49 @@ function App() {
                 display: 'inline', m:1
               }}
             >
+              <div style={{display: (showChart? 'block': 'none')}}>
               <VegaLite spec={spec} data = {{table: metrics.map(x => x[1])}} />
+              </div>
               {
                 // console.log(indicies, metrics)
-                indicies.map((i, index) => 
-                  <Scatterplot
-                  method={metrics[index][1].method}
-                  dataName={dataset}
-                  projectionIdx={i}
-                  size={150}
-                  label={label}
-                  />
-                  )
+                indicies.map((i, index) => {return (
+                <div  style={{margin: 3}} key={`${dataset}-${i}`}>
+										<div>
+											
+										</div>
+										<Scatterplot
+                      push={() =>{
+                        list.push(i)
+                        console.log(list)
+                        console.log(cluster)
+                      }}
+                      pop={() => {
+                        list.pop(i)
+                        console.log(list)
+                      }}
+											projectionIdx={i}
+											size={150}
+											dataName={dataset}
+											label={label}
+                      method={metrics[index][1].method}
+											// isLabel={props.isLabel}
+											radius={radius}
+										/>
+									</div>)
+                  // <Scatterplot
+                  // method={metrics[index][1].method}
+                  // dataName={dataset}
+                  // projectionIdx={i}
+                  // size={150}
+                  // label={label}
+                  // />
               }
-            </Box>)
+
+                  )}
+            </Box>
+            </>)
           })}
         </Box>
-      </FormControl>
       </Box>
     </div>
   );

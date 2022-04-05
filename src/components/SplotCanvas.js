@@ -7,7 +7,6 @@ const SplotCanvas = (props) => {
 	const label = props.label;
 	const canvasRef = useRef(null);
 
-	console.log(ld, label)
 
 
 	useEffect(() => {
@@ -18,10 +17,10 @@ const SplotCanvas = (props) => {
 		function drawScatterplot() {
 			const canvas = canvasRef.current;
 			const ctx = canvas.getContext("2d");
-			ctx.fillStyle="white";
+			// ctx.fillStyle="white";
 			const width = canvas.width;
 			const height = canvas.height;
-			ctx.fillRect(0, 0, width, height);
+			// ctx.fillRect(0, 0, width, height);
 
 			const xScale = d3.scaleLinear().range([0, width]).domain(d3.extent(ld, d => d[0]));
 			const yScale = d3.scaleLinear().range([height, 0]).domain(d3.extent(ld, d => d[1]));
@@ -43,7 +42,7 @@ const SplotCanvas = (props) => {
 		}
 
 		drawScatterplot();
-	});
+	}, [label, ld, props.radius]);
 
 	return (
 		<a className="sct">
