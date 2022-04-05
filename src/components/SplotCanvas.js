@@ -7,6 +7,8 @@ const SplotCanvas = (props) => {
 	const label = props.label;
 	const canvasRef = useRef(null);
 
+	console.log(ld, label)
+
 
 	useEffect(() => {
 		// draw a scatterplot in the canvas (canvasRef)
@@ -21,10 +23,8 @@ const SplotCanvas = (props) => {
 			const height = canvas.height;
 			ctx.fillRect(0, 0, width, height);
 
-
 			const xScale = d3.scaleLinear().range([0, width]).domain(d3.extent(ld, d => d[0]));
 			const yScale = d3.scaleLinear().range([height, 0]).domain(d3.extent(ld, d => d[1]));
-
 			const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
 			ld.forEach((datum, i) => {
 				ctx.beginPath();
@@ -48,7 +48,7 @@ const SplotCanvas = (props) => {
 	return (
 		<a className="sct">
 			<canvas
-				id={`${props.dataName}_${props.projectionIdx}.jpeg`}
+				id={`${props.dataName}_${props.projectionIdx}`}
 				width={props.size * 2}
 				height={props.size * 2}
 				ref={canvasRef}
