@@ -1,7 +1,7 @@
 
 import './App.css';
-import { useEffect, useRef, useState } from 'react';
-import { Vega, VegaLite } from 'react-vega'
+import {  useRef, useState } from 'react';
+import {  VegaLite } from 'react-vega'
 import Scatterplot from './components/Scatterplot';
 
 import { Box, InputLabel, MenuItem, FormControl, Select,FormControlLabel, Switch } from '@mui/material';
@@ -113,11 +113,30 @@ const datasets = {
 
   const radius = 2.5;
 
+  const metricType = [
+    'DTM_KL1',
+    'DTM_KL01',
+    'DTM_KL001',
+    'RMSE',
+    'Sammon',
+    'Spearman',
+    'Trustworthiness',
+    'Continuity',
+    'Steadiness',
+    'Cohesiveness'
+    ];
+
+  const metricTooltip = metricType.map(x => {
+    return ({
+    "type": "quantitative",
+    "field": x
+  })});
+
   const pcpSpec = {
     "data": {"name": "table"},
     "transform":[
       {"window": [{"op": "count", "as": "index"}]},
-      {"fold": ["Cohesiveness", "Continuity", "Steadiness", "Trustworthiness"]},
+      {"fold": metricType},
       {
         "joinaggregate": [
           {"op": "min", "field": "value", "as": "min"},
@@ -145,22 +164,10 @@ const datasets = {
       "encoding": {
         "color": {"type": "nominal", "field": "cluster"},
         "detail": {"type": "nominal", "field": "index"},
-        "opacity": {"value": 0.3},
+        "opacity": {"value": 0.5},
         "x": {"type": "nominal", "field": "key"},
         "y": {"type": "quantitative", "field": "norm_val", "axis": null},
-        "tooltip": [{
-          "type": "quantitative",
-          "field": "Cohesiveness"
-        }, {
-          "type": "quantitative",
-          "field": "Steadiness"
-        }, {
-          "type": "quantitative",
-          "field": "Continuity"
-        }, {
-          "type": "quantitative",
-          "field": "Trustworthiness"
-        }]
+        "tooltip": metricTooltip
       }
     }, {
       "encoding": {
@@ -199,7 +206,7 @@ const datasets = {
           "text": {"aggregate": "min", "field": "min"}
         }
       }, {
-        "mark": {"type": "tick", "style": "tick", "size": 8, "color": "#ccc"}
+        "mark": {"type": "tick", "style": "tick", "size": 8, "color": "#ccc", "thickness": 3,}
       }]
     }
   ],"config": {
@@ -217,7 +224,7 @@ const datasets = {
     //   "y": {"type": "quantitative", "field": "value", "axis": null},
     //   "color": {"field": "cluster", "type": "nominal"}
     // },
-    "width":500,
+    "width":1200,
     "height":300
   }
     
@@ -322,12 +329,12 @@ function App() {
 										<Scatterplot
                       push={() =>{
                         list.push(i)
-                        console.log(list)
-                        console.log(cluster)
+                        // console.log(list)
+                        // console.log(cluster)
                       }}
                       pop={() => {
                         list.pop(i)
-                        console.log(list)
+                        // console.log(list)
                       }}
 											projectionIdx={i}
 											size={150}
