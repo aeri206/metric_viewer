@@ -3,8 +3,7 @@ import * as d3 from 'd3';
 
 const SplotCanvas = (props) => {
 
-	const ld = props.ld;
-	const label = props.label;
+	const { ld, label, bgColor } = props;
 	const canvasRef = useRef(null);
 
 
@@ -17,10 +16,10 @@ const SplotCanvas = (props) => {
 		function drawScatterplot() {
 			const canvas = canvasRef.current;
 			const ctx = canvas.getContext("2d");
-			// ctx.fillStyle="white";
+			ctx.fillStyle=bgColor;
 			const width = canvas.width;
 			const height = canvas.height;
-			// ctx.fillRect(0, 0, width, height);
+			ctx.fillRect(0, 0, width, height);
 
 			const xScale = d3.scaleLinear().range([0, width]).domain(d3.extent(ld, d => d[0]));
 			const yScale = d3.scaleLinear().range([height, 0]).domain(d3.extent(ld, d => d[1]));

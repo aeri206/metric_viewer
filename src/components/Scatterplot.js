@@ -1,4 +1,4 @@
-import { Typography, Box, Checkbox } from '@mui/material';
+import { Typography, Box } from '@mui/material';
 import React, { useState } from 'react';
 import SplotCanvas from './SplotCanvas';
 import './Scatterplot.css';
@@ -6,11 +6,10 @@ import './Scatterplot.css';
 const Scatterplot = (props) => {
 
 	const [checked, setChecked] = useState(props.doneCheck);
-	// const onCheck = () => setChecked(!checked);
+	
 
-	const size = props.size;
-	const projectionIdx = props.projectionIdx;
-	const dataName = props.dataName;
+	const { size, projectionIdx, dataName, filtered	} = props;
+	
 	
 	const ld = require(`/public/data/ld/${dataName}/ld_${projectionIdx}.json`);
 	const metadata = require(`/public/data/ld/${dataName}/metadata_${projectionIdx}.json`);
@@ -33,20 +32,10 @@ const Scatterplot = (props) => {
 				}
 
 			}}
-			
-			// onClick={(e) => {
-			// 	// do something from parent
-			// 	setChecked(!checked);
-			// 	if (!checked){
-			// 		props.push();
-			// 	}
-			// 	else {
-			// 		props.pop();
-			// 	}
-			// 	}}
 				/>
 			<label htmlFor={`sct${dataName}-${projectionIdx}`}>
 			<SplotCanvas
+				bgColor={filtered ? 'white': 'rgba(0, 0, 0, 0.2)'}
 				projectionIdx={projectionIdx}
 				dataName={dataName}
 				size={size}

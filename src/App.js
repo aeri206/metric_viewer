@@ -4,7 +4,10 @@ import {  useEffect, useRef, useState } from 'react';
 import {  VegaLite } from 'react-vega'
 import Scatterplot from './components/Scatterplot';
 
-import { ToggleButtonGroup, ToggleButton, Box, InputLabel, MenuItem, FormControl, Select,FormControlLabel, Switch, Typography } from '@mui/material';
+import embed from 'vega-embed';
+
+import { ToggleButtonGroup, ToggleButton, Box, InputLabel, MenuItem, FormControl, Select,FormControlLabel, Switch } from '@mui/material';
+
 
 const spec = {
   "config": {"view": {"continuousWidth": 400, "continuousHeight": 300}},
@@ -140,12 +143,34 @@ const datasets = {
 
   
 
-function App() {
+  const filtereds = 
+  {"boston": [0, 1, 2, 10, 11, 20, 24, 25, 26, 30, 37, 45, 46, 57, 58, 66],
+"breastcancercoimbra": [1, 4, 5, 9, 17, 20, 22, 29, 30, 34, 37, 46, 47, 54, 60],
+"breastcancerwisconsinprognostic": [0, 5, 8, 24, 30, 32, 34, 38, 46, 54, 64],
+"covertype": [0, 2, 10, 20, 23, 26, 35, 44, 47, 49, 60, 64],
+"dermatology": [1, 4, 5, 8, 11, 23, 28, 33, 40, 46, 50, 55, 61, 65, 68],
+"drybean": [0, 3, 6, 10, 14, 20, 21, 26, 29, 33, 38, 45, 50, 54, 61, 62, 64],
+"echocardiogram": [0, 16, 17, 20, 52, 54, 61],
+"ecoli": [0, 1, 10, 18, 20, 21, 22, 23, 46, 47, 55, 62, 66, 67],
+"extyaleb": [5, 22, 25, 27, 39, 46, 50, 53, 55, 65, 68],
+"glassidentification": [0, 2, 6, 8, 10, 20, 22, 30, 39, 40, 43, 51, 62, 63, 68],
+"heartdisease": [0, 2, 8, 10, 11, 13, 21, 31, 33, 43, 45, 64, 68],
+"hepatitis": [0, 6, 15, 23, 25, 27, 28, 31, 33, 34, 42, 47, 58],
+"housing": [1, 12, 13, 14, 23, 25, 29, 38, 49, 50, 61],
+"iris": [0, 3, 20, 21, 22, 29, 37, 46, 53, 66],
+"mnist64": [0, 6, 12, 20, 25, 35, 39, 45, 50, 57, 68],
+"olive": [0, 9, 10, 20, 33, 34, 47, 49, 59],
+"weather": [0, 6, 15, 20, 21, 31, 35, 45, 67, 69],
+"wine": [0, 3, 9, 12, 18, 20, 32, 36, 44, 49, 50, 66],
+"world12d": [0, 10, 12, 14, 15, 20, 22, 23, 24, 35, 37, 45, 50, 51, 59, 62, 66, 69]}
+  function App() {
 
   const [dataset, setDataset] = useState('mnist64');
   const [showChart, setShowChart] = useState(true);
 
   const [clusterType, SetClusterType] = useState('hdbscan');
+
+  const [drType, setDrType] = useState('tsne');
 
 
   const [numLine, setNumLine] = useState(0);
@@ -158,8 +183,9 @@ function App() {
   const kmeans = require(`/public/data/kmeans/clustering_${dataset}.json`);
   const hdbscan = require(`/public/data/hdbscan/clustering_${dataset}.json`);
   const label = require(`/public/data/ld/${dataset}/label.json`);
-
   
+  
+  // 
 
   
 
@@ -260,6 +286,131 @@ function App() {
     
   }];
 
+  
+
+  useEffect(async () => {
+    
+    
+    const dr_data = require(`/public/data/${drType}/${dataset}_${drType}.json`);
+    console.log(dr_data)
+
+    const testSpec = {
+      "$schema": "https://vega.github.io/schema/vega/v5.json",
+      "description": "A basic bar chart example, with value labels shown upon mouse hover.",
+      "width": 300,
+      "height": 300,
+      "padding": 5,
+      "data": [
+        {
+          "name": "table",
+          "values": 
+          Object.values(dr_data)
+          // [
+          //   {"category": 1, "amount": 28},
+          //   {"category": 2, "amount": 55},
+          //   {"category": 3, "amount": 43},
+          //   {"category": 4, "amount": 91},
+          //   {"category": 5, "amount": 81},
+          //   {"category": 6, "amount": 53},
+          //   {"category": 7, "amount": 19},
+          //   {"category": 8, "amount": 87}
+          // ]
+        }
+      ],
+    
+      
+    
+      "scales": [
+        {
+          "name": "x",
+          "type": "linear",
+          "round": true,
+          "nice": true,
+          "zero": true,
+          "domain": {"data": "table", "field": "xpos"},
+          "range": "width",
+        },
+        {
+          "name": "y",
+          "type": "linear",
+          "round": true,
+          "nice": true,
+          "zero": true,
+          "domain": {"data": "table", "field": "ypos"},
+          "range": "height"
+        },
+        {
+          "name": "cscale",
+          "type": "ordinal",
+          "range": "category",
+          "domain": {"data": "table", "field": "method"}
+        }
+      ],
+    
+      "axes": [
+        { "orient": "bottom", "scale": "x" },
+        { "orient": "left", "scale": "y" }
+      ],
+      "legends": [
+        {
+          "stroke": "cscale",
+          "title": "method",
+          "padding": 4,
+          "encode": {
+            "symbols": {
+              "enter": {
+                "strokeWidth": {"value": 2},
+                "size": {"value": 50}
+              }
+            }
+          }
+        }
+      ],
+    
+      "marks": [
+        {
+          "type": "symbol",
+          "from": {"data":"table"},
+          "encode": {
+            "update": {
+              "x": {"scale": "x", "field": "xpos"},
+              // "width": {"scale": "xscale", "band": 1},
+              "y": {"scale": "y", "field": "ypos"},
+              "shape": {"value": "circle"},
+              // "fill": {"value": "steelblue"}
+              "fill": {"scale": "cscale", "field": "method"},
+              "stroke": {"scale": "cscale", "field": "method"},
+              "strokeWidth": {"value": 2},
+              // "stroke": {"field": "method"},
+              "opacity": {"value": 0.5},
+              "size": {"value":40}
+            },
+            "hover": {
+              "fill": {"value": "red"},
+              "stroke": {"value": "red"}
+            }
+          }
+        },
+      ]
+    }
+
+    // const data = require(`/public/data/tsne/${dataset}_tsne.json`)
+    const result = await embed('#vis', testSpec);
+    console.log(result);
+    
+    result.view.addEventListener('click', (_, item) => { 
+      if (item){
+        if (item.datum){
+
+        }
+      }
+    })
+
+  }, [dataset, drType]);
+  
+
+
+  
 
   return (
     <div className="App">
@@ -269,13 +420,11 @@ function App() {
             const data = Object.entries(metric).map(x => ({idx: parseInt(x[0]), ...x[1]})).map(
               x => ({...x, "cluster": x["cluster_"+clusterType] })
             );
-            console.log(data);
             
             if (clusterType === "hdbscan") {
               pcpSpec.transform = [...pcpSpec.transform, {"filter":"datum.cluster_hdbscan != '-1'"}]
             };
           
-            console.log(lineUpdate, list.current)
             if (numLine > 0 && lineUpdate)
               pcpSpec.transform = [...pcpSpec.transform, {"filter":{"field": "idx", "oneOf": list.current}}]
             
@@ -324,6 +473,20 @@ function App() {
           }
         </Select>
         </FormControl>
+        <ToggleButtonGroup
+      color="primary"
+      value={drType}
+      exclusive
+      onChange={e => {
+        setDrType(e.target.value);
+      }}
+    >
+      <ToggleButton value="tsne">t-SNE</ToggleButton>
+      <ToggleButton value="umap">UMAP</ToggleButton>
+    </ToggleButtonGroup>
+        </Box>
+        <Box id="vis">
+
         </Box>
           <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)' }}>
             {Object.entries((clusterType === "hdbscan")? hdbscan: kmeans).map(([cluster, indicies]) => {
@@ -350,30 +513,28 @@ function App() {
               :<VegaLite spec={{title: `cluster-${cluster}`, ...spec}} data = {{table: metrics.map(x => x[1])}} />)}
               </div>
               {
-                // console.log(indicies, metrics)
-                indicies.map((i, index) => {return (
+                
+                indicies.map((i, index) => {
+                  return (
                 <div  style={{margin: 3}} key={`${dataset}-${i}`}>
 										<Scatterplot
                       doneCheck = {list.current.includes(i)}
+                      filtered = {filtereds[dataset].includes(i)}
                       push={() =>{
                         list.current.push(i)
                         setLineUpdate(true);
                         setNumLine(list.current.length)
-                        // console.log(list)
-                        // console.log(cluster)
                       }}
                       pop={() => {
                         list.current.pop(i)
                         setLineUpdate(true);
                         setNumLine(list.current.length)
-                        // console.log(list)
                       }}
 											projectionIdx={i}
 											size={150}
 											dataName={dataset}
 											label={label}
                       method={metrics[index][1].method}
-											// isLabel={props.isLabel}
 											radius={radius}
 										/>
 									</div>)
