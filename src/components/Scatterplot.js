@@ -1,11 +1,11 @@
-import { Typography, Box } from '@mui/material';
+import { Typography, Box, Checkbox } from '@mui/material';
 import React, { useState } from 'react';
 import SplotCanvas from './SplotCanvas';
 import './Scatterplot.css';
 
 const Scatterplot = (props) => {
 
-	const [checked, setChecked] = useState(false);
+	const [checked, setChecked] = useState(props.doneCheck);
 	// const onCheck = () => setChecked(!checked);
 
 	const size = props.size;
@@ -22,8 +22,8 @@ const Scatterplot = (props) => {
 			<Typography variant='body2' sx={{fontSize: "15"}} >
 				{projectionIdx + ' (' + props.method + ')'}
 			</Typography>
-			<input className="sct-check" type="checkbox" id={`sct${dataName}-${projectionIdx}`} value={checked} onClick={(e) => {
-				// do something from parent
+			<input className="sct-check" type="checkbox" id={`sct${dataName}-${projectionIdx}`} checked={checked? true: false} 
+			onChange={() => {
 				setChecked(!checked);
 				if (!checked){
 					props.push();
@@ -31,7 +31,20 @@ const Scatterplot = (props) => {
 				else {
 					props.pop();
 				}
-				}}/>
+
+			}}
+			
+			// onClick={(e) => {
+			// 	// do something from parent
+			// 	setChecked(!checked);
+			// 	if (!checked){
+			// 		props.push();
+			// 	}
+			// 	else {
+			// 		props.pop();
+			// 	}
+			// 	}}
+				/>
 			<label htmlFor={`sct${dataName}-${projectionIdx}`}>
 			<SplotCanvas
 				projectionIdx={projectionIdx}

@@ -1,10 +1,10 @@
 
 import './App.css';
-import {  useRef, useState } from 'react';
+import {  useEffect, useRef, useState } from 'react';
 import {  VegaLite } from 'react-vega'
 import Scatterplot from './components/Scatterplot';
 
-import { Box, InputLabel, MenuItem, FormControl, Select,FormControlLabel, Switch } from '@mui/material';
+import { ToggleButtonGroup, ToggleButton, Box, InputLabel, MenuItem, FormControl, Select,FormControlLabel, Switch, Typography } from '@mui/material';
 
 const spec = {
   "config": {"view": {"continuousWidth": 400, "continuousHeight": 300}},
@@ -130,9 +130,41 @@ const datasets = {
     return ({
     "type": "quantitative",
     "field": x
-  })});
+  })}).concat([{
+    "type": "nominal",
+    "field": "idx"
+  }, {
+    "type": "nominal",
+    "field": "method"
+  }]);
 
-  const pcpSpec = {
+  
+
+function App() {
+
+  const [dataset, setDataset] = useState('mnist64');
+  const [showChart, setShowChart] = useState(true);
+
+  const [clusterType, SetClusterType] = useState('hdbscan');
+
+
+  const [numLine, setNumLine] = useState(0);
+  const [lineUpdate, setLineUpdate] = useState(false);
+  
+  const list = useRef([]);
+  
+  
+  const metric = require(`/public/data/metric/${dataset}_metrics.json`);
+  const kmeans = require(`/public/data/kmeans/clustering_${dataset}.json`);
+  const hdbscan = require(`/public/data/hdbscan/clustering_${dataset}.json`);
+  const label = require(`/public/data/ld/${dataset}/label.json`);
+
+  
+
+  
+
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  const pcpSpecArr = [{
     "data": {"name": "table"},
     "transform":[
       {"window": [{"op": "count", "as": "index"}]},
@@ -151,27 +183,18 @@ const datasets = {
       {
         "calculate": "(datum.min + datum.max) / 2",
         "as": "mid"
-      }
+      },
     ],
-    "layer": [{
+    "layer": [
+      {
       "mark": {"type": "rule", "color": "#ccc"},
       "encoding": {
         "detail": {"aggregate": "count"},
-        "x": {"field": "key"}
+        "x": {"field": "key", "sort": metricType}
       }
-    }, {
-      "mark": "line",
+    },{
       "encoding": {
-        "color": {"type": "nominal", "field": "cluster"},
-        "detail": {"type": "nominal", "field": "index"},
-        "opacity": {"value": 0.5},
-        "x": {"type": "nominal", "field": "key"},
-        "y": {"type": "quantitative", "field": "norm_val", "axis": null},
-        "tooltip": metricTooltip
-      }
-    }, {
-      "encoding": {
-        "x": {"type": "nominal", "field": "key"},
+        "x": {"type": "nominal", "field": "key", "sort": metricType},
         "y": {"value": 0}
       },
       "layer": [{
@@ -184,8 +207,8 @@ const datasets = {
       }]
     },{
       "encoding": {
-        "x": {"type": "nominal", "field": "key"},
-        "y": {"value": 150}
+        "x": {"type": "nominal", "field": "key", "sort": metricType},
+        "y": {"value": 100}
       },
       "layer": [{
         "mark": {"type": "text", "style": "label"},
@@ -197,8 +220,8 @@ const datasets = {
       }]
     },{
       "encoding": {
-        "x": {"type": "nominal", "field": "key"},
-        "y": {"value": 300}
+        "x": {"type": "nominal", "field": "key", "sort": metricType},
+        "y": {"value": 200}
       },
       "layer": [{
         "mark": {"type": "text", "style": "label"},
@@ -207,6 +230,21 @@ const datasets = {
         }
       }, {
         "mark": {"type": "tick", "style": "tick", "size": 8, "color": "#ccc", "thickness": 3,}
+      }]
+    },{
+      "mark": "line",
+      "encoding": {
+        "color":{"type": "nominal", "field": "cluster", "legend": {"title": null, "orient": "bottom", "direction": "horizontal","symbolStrokeWidth": 5,"labelFontSize":15, "labelFontWeight":400}},
+        "opacity": {"condition": {"param": "select-cluster", "value": 0.6}, "value": 0.1},
+        "detail": {"type": "nominal", "field": "index"},
+        "x": {"type": "nominal", "field": "key", "sort": metricType},
+        "y": {"type": "quantitative", "field": "norm_val", "axis": null},
+        "tooltip": metricTooltip
+      },
+      "params":[{
+        "name": "select-cluster",
+        "select": {"type": "point", "fields": ["cluster"]},
+        "bind": "legend"
       }]
     }
   ],"config": {
@@ -217,77 +255,67 @@ const datasets = {
       "tick": {"orient": "horizontal"}
     }
   },
-    // "mark": "line",
-    // "encoding": {
-    //   "x": {"field": "key", "type": "nominal"},
-    //   // "y": {"field": "value", "type": "quantitative"},
-    //   "y": {"type": "quantitative", "field": "value", "axis": null},
-    //   "color": {"field": "cluster", "type": "nominal"}
-    // },
     "width":1200,
-    "height":300
-  }
+    "height":200,
     
-//   "layer": [
-//   {
-//     "mark": "line",
-//     "encoding": {
-//       "color": {"type": "nominal", "field": "cluster"},
-//       "detail": {"type": "nominal", "field": "idx"},
-//       "opacity": {"value": 0.3},
-//       "x": {"type": "nominal", "field": "key"},
-//       "y": {"type": "quantitative", "field": "norm_val", "axis": null},
-//       "tooltip": [
-//         {"type": "quantitative", "field": "key"}]
-//       //   {"type": "quantitative", "field": "Beak Depth (mm)"},
-//       //   {"type": "quantitative", "field": "Flipper Length (mm)"},
-//       //   {"type": "quantitative", "field": "Body Mass (g)"}
-//       // ]
-//     }
-//   }
-// ]
-
-
-function App() {
-
-  const [dataset, setDataset] = useState('mnist64');
-  const [showChart, setShowChart] = useState(true);
-
-  
-  
-  const handleChange = e => {
-    setDataset(e.target.value);
-  }
-
-  const metric = require(`/public/data/metric/${dataset}_metrics.json`);
-  const kmeans = require(`/public/data/kmeans/clustering_${dataset}.json`);
-  const label = require(`/public/data/ld/${dataset}/label.json`);
-
-  let list = [];
-  
-
-  const metricIdx = Object.entries(metric).map(x => ({idx: parseInt(x[0]), ...x[1]}))
-  const pcpRef = useRef(metricIdx);
-  console.log(pcpRef.current)
-  
-
+  }];
 
 
   return (
     <div className="App">
       <Box alignItems="left">
+        <Box sx={{position: "fixed", height: "250px", zIndex: 10, top: '10px', backgroundColor: "white", width: "100%"}}>
+          {pcpSpecArr.map(pcpSpec => {
+            const data = Object.entries(metric).map(x => ({idx: parseInt(x[0]), ...x[1]})).map(
+              x => ({...x, "cluster": x["cluster_"+clusterType] })
+            );
+            console.log(data);
+            
+            if (clusterType === "hdbscan") {
+              pcpSpec.transform = [...pcpSpec.transform, {"filter":"datum.cluster_hdbscan != '-1'"}]
+            };
+          
+            console.log(lineUpdate, list.current)
+            if (numLine > 0 && lineUpdate)
+              pcpSpec.transform = [...pcpSpec.transform, {"filter":{"field": "idx", "oneOf": list.current}}]
+            
+            // lineUpdate.current = false;
+            
+            return(<VegaLite key={`pcp-vega-${numLine}`} spec={pcpSpec} data={{table: data}}/>)
+          })
+          }
+        </Box>
+        <Box sx={{paddingTop: '260px'}}>
+        <ToggleButtonGroup
+      color="primary"
+      value={clusterType}
+      exclusive
+      onChange={e => {
+        SetClusterType(e.target.value);
+      }}
+    >
+      <ToggleButton value="kmeans">K-means</ToggleButton>
+      <ToggleButton value="hdbscan">hdbscan</ToggleButton>
+    </ToggleButtonGroup>
       <FormControlLabel
         sx={{display:''}}
         control={<Switch checked={showChart} onChange={(e) => {setShowChart(e.target.checked)}}/>}
         label="Metrics" />
-      <FormControl >
+      <FormControl 
+      >
         <InputLabel id="demo-simple-select-label">Dataset</InputLabel>
         <Select
           labelId="demo-simple-select-label"
           id="demo-simple-select"
           value={dataset}
           label="dataset"
-          onChange={handleChange}
+          onChange={e => {
+            setDataset(e.target.value);
+            setLineUpdate(false);
+            setNumLine(0);
+            list.current = [];
+
+          }}
         >
           {
             Object.keys(datasets).map(key => {
@@ -296,20 +324,20 @@ function App() {
           }
         </Select>
         </FormControl>
-        {/* PCP HERE! */}
-        <Box>
-        <VegaLite spec={pcpSpec} data={{table: pcpRef.current}}/>
         </Box>
-        <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)' }}>
-          {Object.values(kmeans).map((indicies, cluster) => {
+          <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)' }}>
+            {Object.entries((clusterType === "hdbscan")? hdbscan: kmeans).map(([cluster, indicies]) => {
+            
             const metrics = Object.entries(metric).filter(([key, value]) => {
               return indicies.includes(parseInt(key))
             })
+
             return(
               <>
-            <Box
+              <Box
               component="div"
               key={`cluster-${cluster}`}
+              id={`cluster-${cluster}`}
               className="cluster"
               width='100%'
               sx={{
@@ -317,23 +345,27 @@ function App() {
               }}
             >
               <div style={{display: (showChart? 'block': 'none')}}>
-              <VegaLite spec={spec} data = {{table: metrics.map(x => x[1])}} />
+              {(cluster === '-1' ? 
+              <VegaLite spec={{title: 'outlier', ...spec}} data = {{table: metrics.map(x => x[1])}} />
+              :<VegaLite spec={{title: `cluster-${cluster}`, ...spec}} data = {{table: metrics.map(x => x[1])}} />)}
               </div>
               {
                 // console.log(indicies, metrics)
                 indicies.map((i, index) => {return (
                 <div  style={{margin: 3}} key={`${dataset}-${i}`}>
-										<div>
-											
-										</div>
 										<Scatterplot
+                      doneCheck = {list.current.includes(i)}
                       push={() =>{
-                        list.push(i)
+                        list.current.push(i)
+                        setLineUpdate(true);
+                        setNumLine(list.current.length)
                         // console.log(list)
                         // console.log(cluster)
                       }}
                       pop={() => {
-                        list.pop(i)
+                        list.current.pop(i)
+                        setLineUpdate(true);
+                        setNumLine(list.current.length)
                         // console.log(list)
                       }}
 											projectionIdx={i}
@@ -345,20 +377,15 @@ function App() {
 											radius={radius}
 										/>
 									</div>)
-                  // <Scatterplot
-                  // method={metrics[index][1].method}
-                  // dataName={dataset}
-                  // projectionIdx={i}
-                  // size={150}
-                  // label={label}
-                  // />
               }
 
                   )}
             </Box>
             </>)
+
           })}
-        </Box>
+            
+          </Box>
       </Box>
     </div>
   );
