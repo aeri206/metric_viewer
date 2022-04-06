@@ -6,8 +6,7 @@ import Scatterplot from './components/Scatterplot';
 
 import embed from 'vega-embed';
 
-import { ToggleButtonGroup, ToggleButton, Box, InputLabel, MenuItem, FormControl, Select,FormControlLabel, Switch } from '@mui/material';
-import { projection } from 'vega';
+import { ToggleButtonGroup, Button, ToggleButton, Box, InputLabel, MenuItem, FormControl, Select,FormControlLabel, Switch } from '@mui/material';
 
 
 const spec = {
@@ -504,9 +503,9 @@ const datasets = {
               x => ({...x, "cluster": x["cluster_"+clusterType] })
             );
             
-            if (clusterType === "hdbscan") {
-              pcpSpec.transform = [...pcpSpec.transform, {"filter":"datum.cluster_hdbscan != '-1'"}]
-            };
+            // if (clusterType === "hdbscan") {
+            //   pcpSpec.transform = [...pcpSpec.transform, {"filter":"datum.cluster_hdbscan != '-1'"}]
+            // };
           
             if (numLine > 0 && lineUpdate)
               pcpSpec.transform = [...pcpSpec.transform, {"filter":{"field": "idx", "oneOf": list.current}}]
@@ -545,6 +544,10 @@ const datasets = {
             setDataset(e.target.value);
             setLineUpdate(false);
             setNumLine(0);
+            list.current.forEach(i => {
+              
+              document.querySelector(`input#sct${dataset}-${i}`).checked = false;
+            })
             list.current = [];
 
           }}
@@ -567,6 +570,18 @@ const datasets = {
       <ToggleButton value="tsne">t-SNE</ToggleButton>
       <ToggleButton value="umap">UMAP</ToggleButton>
     </ToggleButtonGroup>
+    <Button onClick={
+      () => {
+        console.log('reset')
+        setLineUpdate(false);
+        setNumLine(0);
+        list.current.forEach(i => {
+          document.querySelector(`input#sct${dataset}-${i}`).checked = false;
+        })
+        list.current = [];
+      }
+    }>Reset selection</Button>
+    <Button>Save selection</Button>
         </Box>
         <Box>
         <Box id="vis-dr-metric" sx={{display:"inline-block"}}>
