@@ -7,6 +7,7 @@ import Scatterplot from './components/Scatterplot';
 import embed from 'vega-embed';
 
 import { ToggleButtonGroup, ToggleButton, Box, InputLabel, MenuItem, FormControl, Select,FormControlLabel, Switch } from '@mui/material';
+import { projection } from 'vega';
 
 
 const spec = {
@@ -292,7 +293,6 @@ const datasets = {
     
     
     const dr_data = require(`/public/data/${drType}/${dataset}_${drType}.json`);
-    console.log(dr_data)
 
     const testSpec = {
       "$schema": "https://vega.github.io/schema/vega/v5.json",
@@ -383,17 +383,19 @@ const datasets = {
         },
       ]
     }
-
-    // const data = require(`/public/data/tsne/${dataset}_tsne.json`)
     const result = await embed('#vis-dr-metric', testSpec);
-    console.log(result);
     
     result.view.addEventListener('click', async (_, item) => { 
       if (item){
         if (item.datum){
-          console.log(item.datum)
           
           const projectionIdx = item.datum.idx;
+          const sct = document.querySelector(`#sct${dataset}-${projectionIdx}`);
+          if (sct.checked){
+            sct.checked = false;
+          } else {
+            sct.click();
+          }
           const ld = require(`/public/data/ld/${dataset}/ld_${projectionIdx}.json`);
           
           const mdpData = ld.map((x, i) =>{return({'xpos': x[0], 'ypos': x[1], 'label': label[i]})})
