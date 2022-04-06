@@ -305,16 +305,6 @@ const datasets = {
           "name": "table",
           "values": 
           Object.values(dr_data)
-          // [
-          //   {"category": 1, "amount": 28},
-          //   {"category": 2, "amount": 55},
-          //   {"category": 3, "amount": 43},
-          //   {"category": 4, "amount": 91},
-          //   {"category": 5, "amount": 81},
-          //   {"category": 6, "amount": 53},
-          //   {"category": 7, "amount": 19},
-          //   {"category": 8, "amount": 87}
-          // ]
         }
       ],
     
@@ -383,7 +373,7 @@ const datasets = {
               "strokeWidth": {"value": 2},
               // "stroke": {"field": "method"},
               "opacity": {"value": 0.5},
-              "size": {"value":40}
+              "size": {"value":200}
             },
             "hover": {
               "fill": {"value": "red"},
@@ -395,12 +385,103 @@ const datasets = {
     }
 
     // const data = require(`/public/data/tsne/${dataset}_tsne.json`)
-    const result = await embed('#vis', testSpec);
+    const result = await embed('#vis-dr-metric', testSpec);
     console.log(result);
     
-    result.view.addEventListener('click', (_, item) => { 
+    result.view.addEventListener('click', async (_, item) => { 
       if (item){
         if (item.datum){
+          console.log(item.datum)
+          
+          const projectionIdx = item.datum.idx;
+          const ld = require(`/public/data/ld/${dataset}/ld_${projectionIdx}.json`);
+          
+          const mdpData = ld.map((x, i) =>{return({'xpos': x[0], 'ypos': x[1], 'label': label[i]})})
+          const mdpSpec = {
+            "$schema": "https://vega.github.io/schema/vega/v5.json",
+            "description": "A basic bar chart example, with value labels shown upon mouse hover.",
+            "width": 300,
+            "height": 300,
+            "padding": 5,
+            "data": [
+              {
+                "name": "table",
+                "values": mdpData
+              }
+            ],
+          
+            
+          
+            "scales": [
+              {
+                "name": "x",
+                "type": "linear",
+                "round": true,
+                "nice": true,
+                "zero": true,
+                "domain": {"data": "table", "field": "xpos"},
+                "range": "width",
+              },
+              {
+                "name": "y",
+                "type": "linear",
+                "round": true,
+                "nice": true,
+                "zero": true,
+                "domain": {"data": "table", "field": "ypos"},
+                "range": "height"
+              },
+              {
+                "name": "cscale",
+                "type": "ordinal",
+                "range": "category",
+                "domain": {"data": "table", "field": "label"}
+              }
+            ],
+          
+            "axes": [
+              { "orient": "bottom", "scale": "x" },
+              { "orient": "left", "scale": "y" }
+            ],
+            "legends": [
+              {
+                "stroke": "cscale",
+                "title": "method",
+                "padding": 4,
+                "encode": {
+                  "symbols": {
+                    "enter": {
+                      "strokeWidth": {"value": 2},
+                      "size": {"value": 50}
+                    }
+                  }
+                }
+              }
+            ],
+          
+            "marks": [
+              {
+                "type": "symbol",
+                "from": {"data":"table"},
+                "encode": {
+                  "update": {
+                    "x": {"scale": "x", "field": "xpos"},
+                    // "width": {"scale": "xscale", "band": 1},
+                    "y": {"scale": "y", "field": "ypos"},
+                    "shape": {"value": "circle"},
+                    // "fill": {"value": "steelblue"}
+                    "fill": {"scale": "cscale", "field": "label"},
+                    // "stroke": {"scale": "cscale", "field": "label"},
+                    // "strokeWidth": {"value": 2},
+                    // "stroke": {"field": "method"},
+                    "opacity": {"value": 0.5},
+                    "size": {"value":40}
+                  },
+                }
+              },
+            ]
+          }
+          await embed('#vis-mdp', mdpSpec);
 
         }
       }
@@ -485,8 +566,13 @@ const datasets = {
       <ToggleButton value="umap">UMAP</ToggleButton>
     </ToggleButtonGroup>
         </Box>
-        <Box id="vis">
+        <Box>
+        <Box id="vis-dr-metric" sx={{display:"inline-block"}}>
 
+        </Box>
+        <Box id="vis-mdp" sx={{display:"inline-block"}} >
+
+        </Box>
         </Box>
           <Box sx={{ display: 'grid', gridTemplateColumns: 'repeat(10, 1fr)' }}>
             {Object.entries((clusterType === "hdbscan")? hdbscan: kmeans).map(([cluster, indicies]) => {
