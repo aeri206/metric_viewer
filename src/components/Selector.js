@@ -16,60 +16,70 @@ const Selector = props => {
     const columns = [{
         property: "idx",
         header: "idx",
+        size: "xsmall",
         sortable: true,
         primary: true
     },
         {
             property: "outlying",
             sortable: true,
+            size:"xsmall",
             header: "outlying",
             render: datum => datum.outlying === "True" ? (<Box style={{fontWeight: 800, color: 'blue'}}>O</Box>) : <Box style={{fontWeight: 800, color:'red'}}>X</Box>
         },
         {
             property: "convex",
             sortable: true,
+            size: "xsmall",
             header: "convex",
             render: datum => datum.convex === "True" ? (<Box style={{fontWeight: 800, color: 'blue'}}>O</Box>) : <Box style={{fontWeight: 800, color:'red'}}>X</Box>
         },
         {
             property: "skinny",
             sortable: true,
+            size: "xsmall",
             header: "skinny",
             render: datum => datum.skinny === "True" ? (<Box style={{fontWeight: 800, color: 'blue'}}>O</Box>) : <Box style={{fontWeight: 800, color:'red'}}>X</Box>
         },
         {
             property: "skewed",
             sortable: true,
+            size: "xsmall",
             header: "skewed",
             render: datum => datum.skewed === "True" ? (<Box style={{fontWeight: 800, color: 'blue'}}>O</Box>) : <Box style={{fontWeight: 800, color:'red'}}>X</Box>
         },
         {
             property: "clumpy",
             sortable: true,
+            size: "xsmall",
             header: "clumpy",
             render: datum => datum.clumpy === "True" ? (<Box style={{fontWeight: 800, color: 'blue'}}>O</Box>) : <Box style={{fontWeight: 800, color:'red'}}>X</Box>
         },
         {
             property: "striated",
             sortable: true,
+            size: "xsmall",
             header: "striated",
             render: datum => datum.striated === "True" ? (<Box style={{fontWeight: 800, color: 'blue'}}>O</Box>) : <Box style={{fontWeight: 800, color:'red'}}>X</Box>
         },
         {
             property: "sparse",
             sortable: true,
+            size: "xsmall",
             header: "sparse",
             render: datum => datum.sparse === "True" ? (<Box style={{fontWeight: 800, color: 'blue'}}>O</Box>) : <Box style={{fontWeight: 800, color:'red'}}>X</Box>
 
         },{
             header: "#",
+            size: "xsmall",
             property: "count",
             sortable: true,
-            render: datum => (parseInt(datum.mdp.split('/').length - 1))
+            // render: datum => (parseInt(datum.mdp.split('/').length - 1))
         },
             {
                 property: "MDP",
                 header: "MDP",
+                size: "100%",
                 sortable: false,
             }
     ]
@@ -135,7 +145,7 @@ const Selector = props => {
                 
             }}/>
         </Box>
-        <DataTable style={{zIndex: 30, backgroundColor: 'white'}}  resizeable sortable 
+        <DataTable style={{zIndex: 30, backgroundColor: 'white'}} sortable fill={true}
             columns={columns}
             data={bucketData.map((instance, index) => {
                 let MDPs = instance.mdp.split('/')
@@ -151,6 +161,7 @@ const Selector = props => {
                 return({
                     ...instance,
                     idx: index,
+                    count: instance.mdp.split('/').length - 1,
                     MDP : (<MDPRow
                         key={`mdprow-${index}`}
                         selection={selectedMDPs.current[scagValue]}
