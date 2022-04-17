@@ -163,7 +163,7 @@ const datasets = {
 "weather": [0, 6, 15, 20, 21, 31, 35, 45, 67, 69],
 "wine": [0, 3, 9, 12, 18, 20, 32, 36, 44, 49, 50, 66],
 "world12d": [0, 10, 12, 14, 15, 20, 22, 23, 24, 35, 37, 45, 50, 51, 59, 62, 66, 69]}
-  function App() {
+  function App(props) {
 
   const [dataset, setDataset] = useState('mnist64');
   const [showChart, setShowChart] = useState(true);
@@ -182,7 +182,8 @@ const datasets = {
   const metric = require(`/public/data/metric/${dataset}_metrics.json`);
   const kmeans = require(`/public/data/kmeans/clustering_${dataset}.json`);
   const hdbscan = require(`/public/data/hdbscan/clustering_${dataset}.json`);
-  const label = require(`/public/data/ld/${dataset}/label.json`);
+  // const label = require(`/public/data/ld/${dataset}/label.json`);
+  const label = props.labels[dataset];
   
   
   // 
@@ -497,7 +498,7 @@ const datasets = {
   return (
     <div className="App">
       <Box alignItems="left">
-        <Box sx={{position: "fixed", height: "250px", zIndex: 10, top: '10px', backgroundColor: "white", width: "100%"}}>
+        <Box sx={{position: "fixed", height: "250px", zIndex: 10, top: '60px', backgroundColor: "white", width: "100%"}}>
           {pcpSpecArr.map(pcpSpec => {
             const data = Object.entries(metric).map(x => ({idx: parseInt(x[0]), ...x[1]})).map(
               x => ({...x, "cluster": x["cluster_"+clusterType] })
@@ -516,7 +517,7 @@ const datasets = {
           })
           }
         </Box>
-        <Box sx={{paddingTop: '260px'}}>
+        <Box sx={{paddingTop: '310px'}}>
         <ToggleButtonGroup
       color="primary"
       value={clusterType}
@@ -629,7 +630,7 @@ const datasets = {
                         setNumLine(list.current.length)
                       }}
                       pop={() => {
-                        list.current.pop(i)
+                        list.current.splice(list.current.findIndex(item => item == i), 1)
                         setLineUpdate(true);
                         setNumLine(list.current.length)
                       }}

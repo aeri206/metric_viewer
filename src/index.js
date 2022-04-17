@@ -2,12 +2,53 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
+import Selector from './components/Selector';
 import reportWebVitals from './reportWebVitals';
+import { BrowserRouter as Router, useRoutes } from "react-router-dom";
+
+
+
+let x = 'scag'
+const bucketData = require(`/public/data/${x}_bin.json`);
+
+const datasets = [
+  'boston', 
+  'breastcancercoimbra',
+  'breastcancerwisconsinprognostic',
+  'covertype',
+  'dermatology',
+  'drybean',
+  'echocardiogram',
+  'ecoli',
+  'extyaleb',
+  'glassidentification',
+  'heartdisease',
+  'hepatitis',
+  'housing', 'iris', 'mnist64', 'olive', 'weather', 'wine', 'world12d']
+
+  const labels = {};
+
+  datasets.forEach(d => {
+      labels[d] = require(`/public/data/ld/${d}/label.json`);
+  });
+
+  const Pages = () => useRoutes([
+    { path: "/", element: <Selector 
+      bucketData={bucketData}
+      labels={labels}
+    />},
+    { path: "/metric_viewer", element: <Selector 
+      bucketData={bucketData}
+      labels={labels}
+    />},
+    { path: "/metric_viewer/clustering", element: <App labels={labels}/> }
+  ])
 
 ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
+  <Router>
+    <Pages />
+  </Router>,
+  
   document.getElementById('root')
 );
 
