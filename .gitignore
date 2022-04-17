@@ -104,3 +104,11 @@ dist
 
 # TernJS port file
 .tern-port
+public/data/all_bin.csv
+public/data/metric_all.json
+public/data/metric_bin.csv
+public/data/scag_all.json
+public/data/scag_bin.csv
+public/data/scag_bin.json
+public/data/scag_bin_archived.csv
+public/data/scagnostic_binned.html
