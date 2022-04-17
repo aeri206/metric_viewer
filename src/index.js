@@ -4,7 +4,7 @@ import './index.css';
 import App from './App';
 import Selector from './components/Selector';
 import reportWebVitals from './reportWebVitals';
-import { BrowserRouter as Router, useRoutes } from "react-router-dom";
+import { HashRouter as Router, useRoutes } from "react-router-dom";
 
 
 
@@ -37,15 +37,11 @@ const datasets = [
       bucketData={bucketData}
       labels={labels}
     />},
-    { path: "/metric_viewer", element: <Selector 
-      bucketData={bucketData}
-      labels={labels}
-    />},
-    { path: "/metric_viewer/clustering", element: <App labels={labels}/> }
+    { path: "/clustering", element: <App labels={labels}/> },
   ])
 
-ReactDOM.render(
-  <Router>
+  ReactDOM.render(
+  <Router basename={process.env.PUBLIC_URL}>
     <Pages />
   </Router>,
   

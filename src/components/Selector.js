@@ -103,7 +103,7 @@ const Selector = props => {
         }
     }
 
-    return (<Grommet theme={theme}>
+    return (<Grommet style={{position: "absolute", top: "50px"}}theme={theme}>
         <Box>
             <Button style={{zIndex: 30}} primary label="save selected mdps" onClick={async () => {
                 const data = Object.entries(selectedMDPs.current).reduce((acc, curr) => {
