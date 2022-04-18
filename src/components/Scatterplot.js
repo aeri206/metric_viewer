@@ -15,8 +15,7 @@ const Scatterplot = (props) => {
 	const metadata = require(`/public/data/ld/${dataName}/metadata_${projectionIdx}.json`);
 
 	return (
-		<Tooltip title={props.method ? (projectionIdx + ' (' + props.method + ')'): (dataName + '(' + projectionIdx + ')')}>
-		<Box sx={props.sx}>
+		<>
 			<input style={{display: 'none'}} type="checkbox" id={`sct${dataName}-${projectionIdx}`} checked={checked? true: false} 
 			onChange={() => {
 				setChecked(!checked);
@@ -48,8 +47,7 @@ const Scatterplot = (props) => {
 			</Typography>
 			</Box>
 			}
-		</Box>
-		</Tooltip>
+			</>
 	)
 
 };

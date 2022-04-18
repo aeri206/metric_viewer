@@ -6,7 +6,7 @@ import Scatterplot from './components/Scatterplot';
 
 import embed from 'vega-embed';
 
-import { ToggleButtonGroup, Button, ToggleButton, Box, InputLabel, MenuItem, FormControl, Select,FormControlLabel, Switch } from '@mui/material';
+import { Tooltip, ToggleButtonGroup, Button, ToggleButton, Box, InputLabel, MenuItem, FormControl, Select,FormControlLabel, Switch } from '@mui/material';
 
 
 const spec = {
@@ -621,6 +621,8 @@ const datasets = {
                 indicies.map((i, index) => {
                   return (
                 <div  style={{margin: 3}} key={`${dataset}-${i}`}>
+                  <Tooltip title={i + ' (' + metrics[index][1].method + ')'}>
+                    <Box>
 										<Scatterplot
                       doneCheck = {list.current.includes(i)}
                       filtered = {filtereds[dataset].includes(i)}
@@ -641,6 +643,8 @@ const datasets = {
                       method={metrics[index][1].method}
 											radius={radius}
 										/>
+                    </Box>
+                    </Tooltip>
 									</div>)
               }
 

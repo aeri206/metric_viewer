@@ -1,4 +1,5 @@
 import Scatterplot from "../Scatterplot";
+import {  Tooltip } from '@mui/material';
 import { Box, Button } from "grommet";
 import { useRef, useState } from "react";
 
@@ -56,21 +57,26 @@ const MDPRow = props => {
             {MDPs.length > 0 && (
             <Box style={{display:"inline-block"}}>
                 {mdpList.map((m) => {
+                    const dataName = m.split('_')[0];
+                    const projectionIdx = m.split('_')[1];
                     return(
-                    <Scatterplot
-                        doneCheck={props.selection.includes(`${m.split('_')[0]}_${parseInt(m.split('_')[1])}`)}
-                        key={`mdpsct-${m}`}
-                        sx={{display:'inline-block', margin:'5px'}}
-                        dataName={m.split('_')[0]}
-                        projectionIdx={parseInt(m.split('_')[1])}
-                        label={labels[m.split('_')[0]]}
-                        size={150}
-                        radius={3}
-                        filtered={true}
-                        push={() => props.push(scagValue, `${m.split('_')[0]}_${parseInt(m.split('_')[1])}`)}
-                        pop={() => props.pop(scagValue, `${m.split('_')[0]}_${parseInt(m.split('_')[1])}`)}  
-                    />
-                )
+                       <Tooltip title={dataName + '(' + projectionIdx + ')'}>
+                           <Box style={{display: "inline-block", margin: "5px"}}>
+                                <Scatterplot
+                                    doneCheck={props.selection.includes(`${dataName}_${parseInt(projectionIdx)}`)}
+                                    key={`mdpsct-${m}`}
+                                    dataName={dataName}
+                                    projectionIdx={parseInt(projectionIdx)}
+                                    label={labels[dataName]}
+                                    size={150}
+                                    radius={3}
+                                    filtered={true}
+                                    push={() => props.push(scagValue, `${dataName}_${parseInt(projectionIdx)}`)}
+                                    pop={() => props.pop(scagValue, `${dataName}_${parseInt(projectionIdx)}`)}
+                                />
+                            </Box>
+                        </Tooltip>
+                    )
                 }
                 )
                 }
