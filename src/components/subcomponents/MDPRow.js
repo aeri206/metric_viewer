@@ -60,11 +60,11 @@ const MDPRow = props => {
                     const dataName = m.split('_')[0];
                     const projectionIdx = m.split('_')[1];
                     return(
-                       <Tooltip title={dataName + '(' + projectionIdx + ')'}>
+                       <Tooltip title={dataName + '(' + projectionIdx + ')'} key={`mdpsct-${m}`}>
                            <Box style={{display: "inline-block", margin: "5px"}}>
                                 <Scatterplot
                                     doneCheck={props.selection.includes(`${dataName}_${parseInt(projectionIdx)}`)}
-                                    key={`mdpsct-${m}`}
+                                    
                                     dataName={dataName}
                                     projectionIdx={parseInt(projectionIdx)}
                                     label={labels[dataName]}

@@ -24,6 +24,7 @@ const SplotCanvas = (props) => {
 			const xScale = d3.scaleLinear().range([0, width]).domain(d3.extent(ld, d => d[0]));
 			const yScale = d3.scaleLinear().range([height, 0]).domain(d3.extent(ld, d => d[1]));
 			const colorScale = d3.scaleOrdinal(d3.schemeCategory10);
+			ctx.globalAlpha = 0.4;
 			ld.forEach((datum, i) => {
 				ctx.beginPath();
 				ctx.arc(xScale(datum[0]), yScale(datum[1]), props.radius, 0, 2 * Math.PI);
@@ -38,6 +39,7 @@ const SplotCanvas = (props) => {
 				// };
 				ctx.closePath();
 			});
+			ctx.globalAlpha = 1.0
 		}
 
 		drawScatterplot();
