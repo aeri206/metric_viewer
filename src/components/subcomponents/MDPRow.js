@@ -17,6 +17,7 @@ const MDPRow = props => {
                 MDPs.length > 0 && (
                     <Button
                         label="select All"
+                        className="select-all"
                         color="lightblue"
                         style={{display:"inline-block"}}
                         onClick={() => {

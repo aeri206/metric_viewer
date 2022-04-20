@@ -116,8 +116,8 @@ const Selector = props => {
     }
 
     return (<Grommet style={{position: "absolute", top: "50px"}}theme={theme}>
-        <Box>
-            <Button style={{zIndex: 30}} primary label="save selected mdps" onClick={async () => {
+        <Box style={{display:"inline-block", width:'100%'}}>
+            <Button style={{zIndex: 30, width: '50%'}} primary label="save selected mdps" onClick={async () => {
                 const data = Object.entries(selectedMDPs.current).reduce((acc, curr) => {
                     const key = curr[0];
                     const mdps = curr[1];
@@ -145,6 +145,9 @@ const Selector = props => {
                     link.click();
                     document.body.removeChild(link);
                 
+            }}/>
+            <Button style={{zIndex: 30, width: '50%'}} primary label="select all mdps on screen" onClick={() => {
+                document.querySelectorAll('button.select-all').forEach(i => i.click())
             }}/>
         </Box>
         <DataTable style={{zIndex: 30, backgroundColor: 'white'}} sortable fill={true}
