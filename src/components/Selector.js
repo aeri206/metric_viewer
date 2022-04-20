@@ -1,8 +1,10 @@
 import { DataTable, Box, Grommet, Button } from "grommet";
 import MDPRow from "./subcomponents/MDPRow";
 import { useRef } from "react";
+import { orderMDP } from "./subcomponents/MDPSort";
 
 const scagKey = ["outlying","convex","skinny","skewed","clumpy","striated","sparse"];
+
 
 
 const Selector = props => {
@@ -84,7 +86,7 @@ const Selector = props => {
             }
     ]
     
-    console.log('selector')
+    
     const theme = {
         global: {
             // font: {
@@ -150,7 +152,7 @@ const Selector = props => {
             data={bucketData.map((instance, index) => {
                 let MDPs = instance.mdp.split('/')
                 MDPs = MDPs.slice(0,MDPs.length-1);
-                MDPs.sort(() => (Math.random() - 0.5));
+                MDPs.sort((a, b) => (orderMDP.findIndex(x => x === a) - orderMDP.findIndex(x => x === b)));
                 const scagValue = scagKey.reduce((acc, curr, idx) => {
                     acc += instance[curr] === 'True' ? 'T' : 'F';
                     return acc;
