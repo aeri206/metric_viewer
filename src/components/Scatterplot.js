@@ -5,7 +5,7 @@ import './Scatterplot.css';
 
 const Scatterplot = (props) => {
 
-	const [checked, setChecked] = useState(props.doneCheck);
+	const [checked, setChecked] = useState(props.doneCheck === -1 ? false : props.doneCheck);
 	
 
 	const { size, projectionIdx, dataName, filtered	} = props;
@@ -16,11 +16,30 @@ const Scatterplot = (props) => {
 
 	return (
 		<>
-			<input style={{display: 'none'}} type="checkbox" id={`sct${dataName}-${projectionIdx}`} checked={checked? true: false} 
+		{
+			props.doneCheck === -1 ? 
+				<input style={{display: 'none'}}
+					type="checkbox" id={`sct${dataName}-${projectionIdx}`}
+					checked={checked? true: false}
+					value={`${dataName}_${projectionIdx}`}
+					onChange={() => {
+						setChecked(!checked);
+						if (!checked){
+							(async() => {
+								await navigator.clipboard.writeText(`${dataName}_${projectionIdx}`);
+							})();
+						}
+						
+			}}
+				/>
+				 : <input style={{display: 'none'}} type="checkbox" id={`sct${dataName}-${projectionIdx}`} checked={checked? true: false} 
 			onChange={() => {
 				setChecked(!checked);
 				if (!checked){
 					props.push();
+					(async() => {
+						await navigator.clipboard.writeText(`${dataName}_${projectionIdx}`);
+					})();
 				}
 				else {
 					props.pop();
@@ -28,6 +47,7 @@ const Scatterplot = (props) => {
 
 			}}
 				/>
+		}
 			<label htmlFor={`sct${dataName}-${projectionIdx}`}>
 			<SplotCanvas
 				bgColor={filtered ? 'white': 'rgba(0, 0, 0, 0.2)'}

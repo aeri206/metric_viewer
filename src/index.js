@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import Selector from './components/Selector';
+import MetricViewer from './components/MetricViewer';
 import reportWebVitals from './reportWebVitals';
 import { HashRouter as Router, useRoutes } from "react-router-dom";
 
@@ -34,9 +35,12 @@ const datasets = [
 
   const Pages = () => useRoutes([
     { path: "/", element: <Selector 
-      bucketData={bucketData}
       labels={labels}
     />},
+    { path: "/method_clusetering", element: <MetricViewer
+      labels={labels}
+    />
+  },
     { path: "/clustering", element: <App labels={labels}/> },
   ])
 

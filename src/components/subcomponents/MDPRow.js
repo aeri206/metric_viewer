@@ -1,18 +1,25 @@
 import Scatterplot from "../Scatterplot";
-import {  Tooltip } from '@mui/material';
+import {  colors, Tooltip } from '@mui/material';
 import { Box, Button } from "grommet";
 import { useRef, useState } from "react";
+import * as d3 from 'd3';
 
 
 const MDPRow = props => {
-    const { MDPs, labels, scagValue } = props;
+    const { MDPs, labels, scagValue, metric, bin } = props;
     const startIdx = useRef(0);
+
+    const colorScale = {
+        'DTM_KL01':d3.interpolateReds,
+        'Trustworthiness':d3.interpolateGreens,
+        'Cohesiveness':d3.interpolateBlues,
+    }
     
-    const [mdpList, updateMDP] = useState(MDPs.slice(0, 5));
+    // const [mdpList, updateMDP] = useState(MDPs.slice(0, 5));
     
     return(
     <Box>
-        <Box style={{display:"inline-block"}}>
+        {/* <Box style={{display:"inline-block"}}>
             {
                 MDPs.length > 0 && (
                     <Button
@@ -55,14 +62,14 @@ const MDPRow = props => {
                 }}
             />
             )}
-            </Box>
+            </Box> */}
             {MDPs.length > 0 && (
             <Box style={{display:"inline-block"}}>
-                {mdpList.map((m) => {
+                {MDPs.map((m) => {
                     const dataName = m.split('_')[0];
                     const projectionIdx = m.split('_')[1];
                     return(
-                       <Tooltip title={dataName + '(' + projectionIdx + ')'} key={`mdpsct-${m}`}>
+                        <Tooltip title={dataName + '(' + projectionIdx + ')'} key={`mdpsct-${m}`} sx={{fontSize: '12px'}}>
                            <Box style={{display: "inline-block", margin: "5px"}}>
                                 <Scatterplot
                                     doneCheck={props.selection.includes(`${dataName}_${parseInt(projectionIdx)}`)}
@@ -76,7 +83,14 @@ const MDPRow = props => {
                                     push={() => props.push(scagValue, `${dataName}_${parseInt(projectionIdx)}`)}
                                     pop={() => props.pop(scagValue, `${dataName}_${parseInt(projectionIdx)}`)}
                                 />
+                                <Box style={{width: '100%', fontSize:'10px'}}>
+                                    {Object.entries(metric[m]).map(([key, value]) => {
+                                        return(<Box style={{height:'20px', backgroundColor: colorScale[key](parseInt(bin[m][key]) / 10)}}>{key}: {Math.round(value*1000) / 1000}</Box>)
+                                    })}
+
+                                </Box>
                             </Box>
+                            
                         </Tooltip>
                     )
                 }

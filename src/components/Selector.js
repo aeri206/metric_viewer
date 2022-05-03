@@ -14,6 +14,10 @@ const Selector = props => {
     
     let x = 'scag'
     const bucketData = require(`/public/data/${x}_bin.json`);
+    x = 'metric'
+    const metricData = require(`/public/data/${x}_some.json`);
+    x = 'all'
+    const metricBin = require(`/public/data/${x}_bin.json`);
     
     const columns = [{
         property: "idx",
@@ -94,8 +98,11 @@ const Selector = props => {
             // }
         },
         dataTable: {
+            pin: 'header',
             body: {
-                extend: `font-size: 15px`
+                extend: `font-size: 15px`,
+                border: 'horizontal',
+                pin:'header'
             },
     
             header: {
@@ -152,7 +159,7 @@ const Selector = props => {
         </Box>
         <DataTable style={{zIndex: 30, backgroundColor: 'white'}} sortable fill={true}
             columns={columns}
-            data={bucketData.map((instance, index) => {
+            data={bucketData.filter(x => x.cnt > 0).map((instance, index) => {
                 let MDPs = instance.mdp.split('/')
                 MDPs = MDPs.slice(0,MDPs.length-1);
                 MDPs.sort((a, b) => (orderMDP.findIndex(x => x === a) - orderMDP.findIndex(x => x === b)));
@@ -170,6 +177,8 @@ const Selector = props => {
                     MDP : (<MDPRow
                         key={`mdprow-${index}`}
                         selection={selectedMDPs.current[scagValue]}
+                        metric={metricData}
+                        bin={metricBin}
                         scagValue={scagValue}
                         reset={(key, li) => {
                             selectedMDPs.current[key] = selectedMDPs.current[key].filter(item => (!li.includes(item)))
@@ -181,7 +190,7 @@ const Selector = props => {
                         pop={(key, d) => {
                             selectedMDPs.current[key].splice(selectedMDPs.current[key].findIndex(item => item == d), 1);
                         }}
-                        MDPs={MDPs} 
+                        MDPs={MDPs}
                         labels={props.labels}
                         />)
                 })
